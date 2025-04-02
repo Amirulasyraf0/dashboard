@@ -18,7 +18,7 @@ export default function Default(props: { [x: string]: any }) {
       </Text>
       <TimelineItem
         mb="16px"
-        title="Meeting with a client"
+        title="Cleaning Task A"
         day="03"
         weekday="Wed"
         hours="08:00 - 10:00"
@@ -26,20 +26,20 @@ export default function Default(props: { [x: string]: any }) {
       />
       <TimelineItem
         mb="16px"
-        title="Webinar - Marketing for Developers"
+       title="Cleaning Task B"
         day="12"
         weekday="Fri"
         hours="10:30 - 12:00"
       />
       <TimelineItem
         mb="16px"
-        title="Design UI and check sales on PayPal"
+        title="Cleaning Task C"
         day="16"
         weekday="Tue"
         hours="09:00 - 14:00"
       />
       <TimelineItem
-        title="Configure table for Daily tasks on Notion"
+        title="Cleaning Task D"
         day="27"
         weekday="Sat"
         hours="20:00 - 22:30"

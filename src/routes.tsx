@@ -22,6 +22,7 @@ const routes = [
     icon: <Icon as={MdDashboard} width="20px" height="20px" color="inherit" />,
     collapse: true,
     items: [
+      /*
       {
         name: 'Users',
         path: '/main/users',
@@ -50,6 +51,7 @@ const routes = [
           },
         ],
       },
+      */
       {
         name: 'Applications',
         path: '/main/applications',
@@ -64,6 +66,7 @@ const routes = [
           },
         ],
       },
+      /*
       {
         name: 'Profile',
         path: '/main/profile',
@@ -84,7 +87,9 @@ const routes = [
             component: <ProfileSettings />,
           },
         ],
+     
       },
+         */
     ],
   },
  ];

@@ -1,6 +1,6 @@
 export const calendarData = [
   {
-    title: "Meeting with a client",
+    title: "Cleaning Task A",
 
     borderColor: "transparent",
     start: "2022-09-27",
@@ -10,7 +10,7 @@ export const calendarData = [
   },
 
   {
-    title: "Webinar - Marketing for Developers",
+    title:  "Cleaning Task B",
 
     borderColor: "transparent",
     start: "2022-10-06",
@@ -20,7 +20,7 @@ export const calendarData = [
   },
 
   {
-    title: "Design UI and check sales on PayPal",
+    title:  "Cleaning Task C",
 
     borderColor: "transparent",
     start: "2022-10-10",
@@ -30,7 +30,7 @@ export const calendarData = [
   },
 
   {
-    title: "Configure table for Daily tasks on Notion",
+    title:  "Cleaning Task D",
 
     borderColor: "transparent",
     start: "2022-10-21",

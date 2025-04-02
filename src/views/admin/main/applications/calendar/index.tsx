@@ -29,6 +29,7 @@ import { calendarData } from 'views/admin/main/applications/calendar/variables/c
 import EventCalendar from 'components/calendar/EventCalendar';
 import Timeline from 'views/admin/main/applications/calendar/components/Timeline';
 import Events from 'views/admin/main/applications/calendar/components/Events';
+import MyCalendar from './components/Calendar';
 
 export default function Default() {
 	// Chakra Color Mode
@@ -47,11 +48,14 @@ export default function Default() {
 				<Text fontSize='2xl' fontWeight='700' color={textColor}>
 					Calendar
 				</Text>
-				<Text fontSize='md' fontWeight='500' color='secondaryGray.600' mb='30px'>
-					September 2022{' '}
+				<Text fontSize='md' fontWeight='500' color='secondaryGray.600' mb='10px'>
+		
 				</Text>
-				<EventCalendar initialDate='2022-10-01' calendarData={calendarData} />
+				<MyCalendar  />
 			</Card>
 		</Grid>
 	);
 }
+
+
+//<EventCalendar initialDate='2022-10-01' calendarData={calendarData} />
