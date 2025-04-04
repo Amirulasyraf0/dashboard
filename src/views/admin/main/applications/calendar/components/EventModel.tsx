@@ -1,8 +1,22 @@
-// EventModal.tsx
-
-import React, { useState } from "react";
-import { Modal, ModalOverlay, ModalContent, ModalCloseButton, ModalHeader, ModalBody, ModalFooter, Button, Input, FormControl, FormLabel, FormErrorMessage } from "@chakra-ui/react"; 
-import { CustomEvent } from "./types/types"; // Importing event type
+import React, { useState } from 'react';
+import {
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalCloseButton,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  Button,
+  Input,
+  FormControl,
+  FormLabel,
+  Select,
+  FormErrorMessage,
+  SimpleGrid,
+  Flex,
+} from '@chakra-ui/react';
+import { CustomEvent, TaskCategory, TaskCategoryColors } from './types/types';
 
 interface EventModalProps {
   isOpen: boolean;
@@ -11,83 +25,181 @@ interface EventModalProps {
 }
 
 const EventModal: React.FC<EventModalProps> = ({ isOpen, onClose, onAddEvent }) => {
-  const [newEventTitle, setNewEventTitle] = useState("");
-  const [newEventStart, setNewEventStart] = useState<Date | null>(null);
-  const [newEventEnd, setNewEventEnd] = useState<Date | null>(null);
-  const [error, setError] = useState<string | null>(null);  // For error message
+  const [newEventTitle, setNewEventTitle] = useState('');
+  const [newEventStartDate, setNewEventStartDate] = useState('');
+  const [newEventStartTime, setNewEventStartTime] = useState('');
+  const [newEventEndDate, setNewEventEndDate] = useState('');
+  const [newEventEndTime, setNewEventEndTime] = useState('');
+  const [eventType, setEventType] = useState<TaskCategory>(TaskCategory.Sweep); // Default to Sweep
 
-  // Handle change for the event title
+  const [error, setError] = useState<string | null>(null);
+
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setNewEventTitle(e.target.value);
   };
 
-  // Handle change for the start datetime
-  const handleStartChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setNewEventStart(new Date(e.target.value));
+  const handleStartDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setNewEventStartDate(e.target.value);
   };
 
-  // Handle change for the end datetime
-  const handleEndChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setNewEventEnd(new Date(e.target.value));
+  const handleStartTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setNewEventStartTime(e.target.value);
+  };
+
+  const handleEndDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setNewEventEndDate(e.target.value);
+  };
+
+  const handleEndTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setNewEventEndTime(e.target.value);
+  };
+
+  const handleEventTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedType = e.target.value as TaskCategory;
+    setEventType(selectedType);
   };
 
   const handleAddEvent = () => {
-    // Validate input
-    if (!newEventTitle || !newEventStart || !newEventEnd) {
-      setError("All fields are required!");
+    if (
+      !newEventTitle ||
+      !newEventStartDate ||
+      !newEventStartTime ||
+      !newEventEndDate ||
+      !newEventEndTime
+    ) {
+      setError('All fields are required!');
       return;
     }
 
-    // Clear error and create new event
+    const startDateTime = new Date(`${newEventStartDate}T${newEventStartTime}`);
+    const endDateTime = new Date(`${newEventEndDate}T${newEventEndTime}`);
+
+    if (startDateTime >= endDateTime) {
+      setError('Start time must be before end time.');
+      return;
+    }
+
     setError(null);
     const newEvent: CustomEvent = {
       title: newEventTitle,
-      start: newEventStart,
-      end: newEventEnd,
+      start: startDateTime,
+      end: endDateTime,
+      type: eventType,
     };
 
-    onAddEvent(newEvent); // Send event to parent
-    onClose(); // Close modal after submitting
+    onAddEvent(newEvent);
+    resetForm();
+    onClose();
+  };
+
+  const resetForm = () => {
+    setNewEventTitle('');
+    setNewEventStartDate('');
+    setNewEventStartTime('');
+    setNewEventEndDate('');
+    setNewEventEndTime('');
+    setEventType(TaskCategory.Sweep); // Reset type to default
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose}>
+    <Modal isOpen={isOpen} onClose={onClose} size="xl" isCentered>
       <ModalOverlay />
       <ModalContent>
-        <ModalHeader>Add New Event</ModalHeader>
+        <ModalHeader>Create New Task</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
-          <FormControl isInvalid={!!error}>
-            <FormLabel>Event Title</FormLabel>
-            <Input
-              placeholder="Event Title"
-              value={newEventTitle}
-              onChange={handleTitleChange} // Use the handler function
-              mb={4}
-            />
-            <FormLabel>Start Time</FormLabel>
-            <Input
-              type="datetime-local"
-              value={newEventStart ? newEventStart.toISOString().slice(0, 16) : ""}
-              onChange={handleStartChange} // Use the handler function
-              mb={4}
-            />
-            <FormLabel>End Time</FormLabel>
-            <Input
-              type="datetime-local"
-              value={newEventEnd ? newEventEnd.toISOString().slice(0, 16) : ""}
-              onChange={handleEndChange} // Use the handler function
-              mb={4}
-            />
-            {error && <FormErrorMessage>{error}</FormErrorMessage>}
-          </FormControl>
+          <SimpleGrid columns={1} spacing={4}>
+
+            
+            {/* Row 1: Event Title */}
+            <FormControl isInvalid={!!error}>
+              <Flex direction="column" mb={4}>
+                <FormLabel>Task Name</FormLabel>
+                <Input
+                  placeholder="Enter Your Task Name"
+                  value={newEventTitle}
+                  onChange={handleTitleChange}
+                />
+                {error && <FormErrorMessage>{error}</FormErrorMessage>}
+              </Flex>
+            </FormControl>
+
+            {/* Row 2: Event Type (Category) */}
+            <FormControl isInvalid={!!error}>
+              <Flex direction="column" mb={4}>
+                <FormLabel>Task Category</FormLabel>
+                <Select value={eventType} onChange={handleEventTypeChange}>
+                  {Object.values(TaskCategory).map((category) => (
+                    <option key={category} value={category}>
+                      {category.charAt(0).toUpperCase() + category.slice(1)}
+                    </option>
+                  ))}
+                </Select>
+                {error && <FormErrorMessage>{error}</FormErrorMessage>}
+              </Flex>
+            </FormControl>
+
+            {/* Row 3: Start Date and Start Time */}
+            <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4}>
+              <FormControl isInvalid={!!error}>
+                <Flex direction="column" mb={4}>
+                  <FormLabel>Start Date</FormLabel>
+                  <Input
+                    type="date"
+                    value={newEventStartDate}
+                    onChange={handleStartDateChange}
+                  />
+                  {error && <FormErrorMessage>{error}</FormErrorMessage>}
+                </Flex>
+              </FormControl>
+
+              <FormControl isInvalid={!!error}>
+                <Flex direction="column" mb={4}>
+                  <FormLabel>Start Time</FormLabel>
+                  <Input
+                    type="time"
+                    value={newEventStartTime}
+                    onChange={handleStartTimeChange}
+                  />
+                  {error && <FormErrorMessage>{error}</FormErrorMessage>}
+                </Flex>
+              </FormControl>
+            </SimpleGrid>
+
+            {/* Row 4: End Date and End Time */}
+            <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4}>
+              <FormControl isInvalid={!!error}>
+                <Flex direction="column" mb={4}>
+                  <FormLabel>End Date</FormLabel>
+                  <Input
+                    type="date"
+                    value={newEventEndDate}
+                    onChange={handleEndDateChange}
+                  />
+                  {error && <FormErrorMessage>{error}</FormErrorMessage>}
+                </Flex>
+              </FormControl>
+
+              <FormControl isInvalid={!!error}>
+                <Flex direction="column" mb={4}>
+                  <FormLabel>End Time</FormLabel>
+                  <Input
+                    type="time"
+                    value={newEventEndTime}
+                    onChange={handleEndTimeChange}
+                  />
+                  {error && <FormErrorMessage>{error}</FormErrorMessage>}
+                </Flex>
+              </FormControl>
+            </SimpleGrid>
+          </SimpleGrid>
         </ModalBody>
         <ModalFooter>
-          <Button variant="ghost" onClick={onClose}>
+          <Button variant="outline" colorScheme="blue" onClick={onClose} mr="10px">
             Cancel
           </Button>
           <Button colorScheme="blue" onClick={handleAddEvent}>
-            Add Event
+            Add Task
           </Button>
         </ModalFooter>
       </ModalContent>

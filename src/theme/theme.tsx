@@ -10,7 +10,7 @@ import { switchStyles } from './components/switch';
 import { linkStyles } from './components/link';
 import { breakpoints } from './foundations/breakpoints';
 import { globalStyles } from './styles';
-// import { globalStyles as globalStylesRed } from './stylesRed';
+
 
 let theme = extendTheme(
   { breakpoints }, // Breakpoints
