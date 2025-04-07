@@ -37,20 +37,13 @@ export default function Default() {
 	return (
 		<Grid
 			pt={{ base: '130px', md: '80px', xl: '80px' }}
-			gridTemplateColumns={{ base: '2.4fr 1fr', lg: '1fr 1.83fr' }}
+			
 			gap={{ base: '20px', xl: '20px' }}
 			display={{ base: 'block', lg: 'grid' }}>
-			<Box gridArea='1 / 1 / 2 / 2'>
-				<Timeline mb='20px' />
-				
-			</Box>
-			<Card gridArea='1 / 2 / 2 / 3' minH='680px'>
-				<Text fontSize='2xl' fontWeight='700' color={textColor}>
-					Calendar
-				</Text>
-				<Text fontSize='md' fontWeight='500' color='secondaryGray.600' mb='10px'>
-		
-				</Text>
+
+			<Card gridArea='1 / 1 / 1 / 1' minH='680px'>
+
+
 				<MyCalendar  />
 			</Card>
 		</Grid>

@@ -1,7 +1,7 @@
 export enum TaskCategory {
   Sweep = 'sweep',
   Mop = 'mop',
-  DailyMaintenance = 'DailyMaintenance',
+  DailyMaintenance = 'Daily Maintenance',
   Other = 'other',
 }
 
@@ -13,8 +13,11 @@ export const TaskCategoryColors = {
 };
 
 export interface CustomEvent {
+  id: number; // <-- Add this line
   title: string;
   start: Date;
   end: Date;
-  type: TaskCategory;  // Event type (category)
+  type: string; 
+  resource: string;
+  //resourceId: string; // Event type (category)
 }

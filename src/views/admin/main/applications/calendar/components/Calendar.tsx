@@ -1,68 +1,165 @@
-import React, { useState } from 'react';
-import { Calendar, momentLocalizer } from 'react-big-calendar';
+import React, { useState, useEffect } from 'react';
+import { Calendar, momentLocalizer, View } from 'react-big-calendar';
 import moment from 'moment';
-import { Box, Button, Card, useColorModeValue, IconButton , Popover, PopoverTrigger, PopoverContent, PopoverArrow, PopoverCloseButton, PopoverBody, PopoverHeader} from '@chakra-ui/react';
-import EventModal from './EventModel'; // Import EventModal component
-import { CustomEvent, TaskCategory, TaskCategoryColors } from './types/types'; // Import TaskCategory and TaskCategoryColors
+import {
+  Box,
+  Button,
+  Card,
+  useColorModeValue,
+  IconButton,
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+  PopoverArrow,
+  PopoverCloseButton,
+  PopoverBody,
+  PopoverHeader,
+  Select,
+} from '@chakra-ui/react';
+import EventModal from './EventModal'; // Import EventModal component
+import { CustomEvent, TaskCategory, TaskCategoryColors } from './types/types'; // Import types
 import 'react-big-calendar/lib/css/react-big-calendar.css';
-
+import { Tooltip } from 'react-tooltip';
+import './calendar.css';
 import { BsPlusCircleFill, BsFillTrashFill } from 'react-icons/bs';
+import CustomToolbar from './CustomToolbar'; // Import CustomToolbar component
 
 
-// Initialize moment localizer for react-big-calendar
+import './calendar.css';
+
+
+
 const localizer = momentLocalizer(moment);
 
 const MyCalendar: React.FC = () => {
-  const [events, setEvents] = useState<CustomEvent[]>([]); // State for events
-  const [isModalOpen, setIsModalOpen] = useState(false); // Modal open state
-  const [selectedEvent, setSelectedEvent] = useState<CustomEvent | null>(null); // To store selected event for deletion
+  const [events, setEvents] = useState<CustomEvent[]>([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedEvent, setSelectedEvent] = useState<CustomEvent | null>(null);
+  const [view, setView] = useState<View>('week');
 
-  const openModal = () => setIsModalOpen(true);  // Function to open modal
-  const closeModal = () => setIsModalOpen(false); // Function to close modal
+  const [filterType, setFilterType] = useState<TaskCategory | 'All'>('All');
 
-  // Add event to the events array
-  const handleAddEvent = (event: CustomEvent) => {
-    setEvents((prevEvents) => [...prevEvents, event]);
+  const openModal = () => setIsModalOpen(true);
+  const closeModal = () => setIsModalOpen(false);
+
+  const handleViewChange = (newView: View) => {
+    setView(newView);
   };
 
-  // Handle deleting event
-  const handleDeleteEvent = (eventToDelete: CustomEvent) => {
-    setEvents((prevEvents) => prevEvents.filter((event) => event !== eventToDelete));
+  const predefinedTasks: CustomEvent[] = [
+    {
+      id: 1,
+      title: 'Team Meeting',
+      start: new Date(2025, 3, 4, 9, 0),
+      end: new Date(2025, 3, 4, 9, 15),
+      type: 'sweep',
+      resource: 'robotA'
+    },
+    {
+      id: 2,
+      title: 'Code Review',
+      start: new Date(2025, 3, 4, 11, 0),
+      end: new Date(2025, 3, 4, 12, 0),
+      type: 'Daily',
+      resource: 'robotB'
+    },
+    {
+      id: 3,
+      title: 'Lunch Break',
+      start: new Date(2025, 3, 4, 12, 30),
+      end: new Date(2025, 3, 4, 13, 30),
+      type: 'break',
+      resource: 'robotB'
+    },
+  ];
+
+  useEffect(() => {
+    setEvents(predefinedTasks);
+  }, []);
+
+  const handleAddEvent = (event: Omit<CustomEvent, 'id'>) => {
+    setEvents((prevEvents) => [...prevEvents, { ...event, id: Date.now() }]);
   };
 
-  // Chakra UI color mode values
-  const bgColor = useColorModeValue('white', 'navy.900');
-  const textColor = useColorModeValue('secondaryGray.900', 'white');
+  const handleDeleteEvent = () => {
+    if (selectedEvent) {
+      setEvents((prevEvents) => prevEvents.filter((event) => event.id !== selectedEvent.id));
+      setSelectedEvent(null);
+    }
+  };
+
+  const filteredEvents =
+    filterType === 'All' ? events : events.filter((event) => event.resource === filterType);
+
+  const bgColor = useColorModeValue('white', 'navy.800');
+  const textColor = useColorModeValue('black', 'white');
   const todayBg = useColorModeValue('secondaryGray.900', '#2a4365');
+  const toolbarTextColor = useColorModeValue('black', 'white');
 
   return (
-    <Box width="100%" display="flex" alignItems="center">
+    <Box width="100%" display="flex" justifyContent="flex-end" alignItems="center">
       <Card width="100%" padding="20px" borderRadius="10px" bg={bgColor}>
-        <Button me="auto" w="140px" variant="brand" fontWeight="500" onClick={openModal}>
-          <Box mr="8px">
-            <BsPlusCircleFill />
-          </Box>
-          Add Event
-        </Button>
+        {/* Controls: Add + Filter */}
+        <Box display="flex" justifyContent="space-between" alignItems="center" mb={4}>
+          <Select
+            width="200px"
+            value={filterType}
+            onChange={(e) => setFilterType(e.target.value as TaskCategory | 'All')}
+          >
+            <option value="All">All</option>
+            <option value="robotA">robotA</option>
+            <option value="robotB">robotB</option>
+            <option value="robotC">robotC</option>
+          </Select>
 
+          <Button w="140px" variant="brand" fontWeight="500" onClick={openModal} ml="auto">
+            <Box mr="8px">
+              <BsPlusCircleFill />
+            </Box>
+            Add Event
+          </Button>
+        </Box>
+
+        {/* Calendar */}
         <Calendar
           localizer={localizer}
-          events={events}
+          tooltipAccessor={null}
+          step={15}
+          events={filteredEvents}
           startAccessor="start"
           endAccessor="end"
           views={['month', 'week', 'day']}
+          view={view}
+          onView={handleViewChange}
           style={{ height: 800, marginTop: 20, color: textColor }}
           eventPropGetter={(event: CustomEvent) => ({
             style: {
-              backgroundColor: TaskCategoryColors[event.type as TaskCategory], // Apply color based on the task category
+              backgroundColor: TaskCategoryColors[event.type as TaskCategory],
               color: 'white',
-              borderRadius: '4px',
-              padding: '4px',
+              borderRadius: '15px',
+              padding: '2px',
+              
             },
-            title: event.start,
-            description: event.type 
           })}
-          onSelectEvent={(event: CustomEvent) => setSelectedEvent(event)} // Set the selected event for deletion
+          components={{
+            toolbar: (props) => (
+              <CustomToolbar {...props} onView={handleViewChange} view={view} />
+            ),
+            event: ({ event }: { event: CustomEvent }) => (
+              <Box
+                data-tooltip-id={`event-tooltip-${event.id}`}
+                data-tooltip-content={`🕒 ${moment(event.start).format('hh:mm A')} - ${moment(
+                  event.end
+                ).format('hh:mm A')}\n ${event.title}`}
+                data-tooltip-place="top"
+                cursor="pointer"
+              >
+                {event.title}
+                <Tooltip id={`event-tooltip-${event.id}`} />
+              </Box>
+            ),
+          }}
+          onSelectEvent={(event: CustomEvent) => setSelectedEvent(event)}
           dayPropGetter={(date) => ({
             style: {
               backgroundColor: moment(date).isSame(moment(), 'day') ? todayBg : 'inherit',
@@ -70,8 +167,30 @@ const MyCalendar: React.FC = () => {
           })}
         />
 
-
-
+        {/* Delete Event Popover */}
+        {selectedEvent && (
+          <Popover>
+            <PopoverTrigger>
+              <IconButton
+                icon={<BsFillTrashFill />}
+                colorScheme="red"
+                aria-label="Delete event"
+                mt={4}
+              />
+            </PopoverTrigger>
+            <PopoverContent>
+              <PopoverArrow />
+              <PopoverCloseButton />
+              <PopoverHeader>Confirm Deletion</PopoverHeader>
+              <PopoverBody>
+                Are you sure you want to delete this event?
+                <Button mt={2} colorScheme="red" onClick={handleDeleteEvent}>
+                  Delete
+                </Button>
+              </PopoverBody>
+            </PopoverContent>
+          </Popover>
+        )}
       </Card>
 
       <EventModal isOpen={isModalOpen} onClose={closeModal} onAddEvent={handleAddEvent} />

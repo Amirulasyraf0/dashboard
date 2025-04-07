@@ -81,10 +81,12 @@ const EventModal: React.FC<EventModalProps> = ({ isOpen, onClose, onAddEvent }) 
 
     setError(null);
     const newEvent: CustomEvent = {
+      id: Date.now(),
       title: newEventTitle,
       start: startDateTime,
       end: endDateTime,
       type: eventType,
+      resource: eventType,
     };
 
     onAddEvent(newEvent);
