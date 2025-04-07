@@ -11,9 +11,9 @@ export enum RobotType {
 }
 
 export const TaskCategoryColors = {
-  [TaskCategory.Cleaning_Task]: '#FF5733',  // Red for meeting
-  [TaskCategory.DailyMaintenance]: '#33FF57', // Green for reminder
-  [TaskCategory.Other]: '#F0E68C',    // Yellow for other
+  [TaskCategory.Cleaning_Task]: '#197278',  // 
+  [TaskCategory.DailyMaintenance]: '#c18c5d', // 
+  [TaskCategory.Other]: '#6d597a',    
 };
 
 export interface CustomEvent {

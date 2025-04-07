@@ -16,13 +16,14 @@ import {
   ModalBody,
   ModalFooter,
 } from '@chakra-ui/react';
-import EventModal from './EventModal'; // Import EventModal component
-import { CustomEvent, TaskCategory, TaskCategoryColors } from './types/types'; // Import types
+import EventModal from './EventModal';
+import { CustomEvent, TaskCategory, TaskCategoryColors } from './types/types';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import { Tooltip } from 'react-tooltip';
 import './calendar.css';
-import { BsPlusCircleFill, BsFillTrashFill } from 'react-icons/bs';
-import CustomToolbar from './CustomToolbar'; // Import CustomToolbar component
+import { BsPlusCircleFill } from 'react-icons/bs';
+import CustomToolbar from './CustomToolbar';
+import { predefinedTasks } from './types/predefinedTasks';
 
 const localizer = momentLocalizer(moment);
 
@@ -32,44 +33,16 @@ const MyCalendar: React.FC = () => {
   const [selectedEvent, setSelectedEvent] = useState<CustomEvent | null>(null);
   const [view, setView] = useState<View>('week');
   const [filterType, setFilterType] = useState<TaskCategory | 'All'>('All');
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false); // New state for delete confirmation modal
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
-
-  const openDeleteModal = () => setIsDeleteModalOpen(true); // Open delete modal
-  const closeDeleteModal = () => setIsDeleteModalOpen(false); // Close delete modal
+  const openDeleteModal = () => setIsDeleteModalOpen(true);
+  const closeDeleteModal = () => setIsDeleteModalOpen(false);
 
   const handleViewChange = (newView: View) => {
     setView(newView);
   };
-
-  const predefinedTasks: CustomEvent[] = [
-    {
-      id: 1,
-      title: 'Team Meeting',
-      start: new Date(2025, 3, 4, 9, 0),
-      end: new Date(2025, 3, 4, 9, 15),
-      type: 'Cleaning_Task',
-      robotType: 'RobotA',
-    },
-    {
-      id: 2,
-      title: 'Code Review',
-      start: new Date(2025, 3, 4, 11, 0),
-      end: new Date(2025, 3, 4, 12, 0),
-      type: 'Daily Maintenance',
-      robotType: 'RobotB',
-    },
-    {
-      id: 3,
-      title: 'Lunch Break',
-      start: new Date(2025, 3, 4, 12, 30),
-      end: new Date(2025, 3, 4, 13, 30),
-      type: 'DailyMaintenance',
-      robotType: 'RobotC',
-    },
-  ];
 
   useEffect(() => {
     setEvents(predefinedTasks);
@@ -83,7 +56,7 @@ const MyCalendar: React.FC = () => {
     if (selectedEvent) {
       setEvents((prevEvents) => prevEvents.filter((event) => event.id !== selectedEvent.id));
       setSelectedEvent(null);
-      closeDeleteModal(); // Close modal after deletion
+      closeDeleteModal();
     }
   };
 
@@ -93,12 +66,11 @@ const MyCalendar: React.FC = () => {
   const bgColor = useColorModeValue('white', 'navy.800');
   const textColor = useColorModeValue('black', 'white');
   const todayBg = useColorModeValue('secondaryGray.900', '#2a4365');
-  const toolbarTextColor = useColorModeValue('black', 'white');
 
   return (
     <Box width="100%" display="flex" justifyContent="flex-end" alignItems="center">
       <Card width="100%" padding="20px" borderRadius="10px" bg={bgColor}>
-        {/* Controls: Add + Filter */}
+        {/* Controls */}
         <Box display="flex" justifyContent="space-between" alignItems="center" mb={4}>
           <Select
             width="200px"
@@ -106,9 +78,9 @@ const MyCalendar: React.FC = () => {
             onChange={(e) => setFilterType(e.target.value as TaskCategory | 'All')}
           >
             <option value="All">All</option>
-            <option value="robotA">Robot A</option>
-            <option value="robotB">Robot B</option>
-            <option value="robotC">Robot C</option>
+            <option value="Robot A">Robot A</option>
+            <option value="Robot B">Robot B</option>
+            <option value="Robot C">Robot C</option>
           </Select>
 
           <Button w="140px" variant="brand" fontWeight="500" onClick={openModal} ml="auto">
@@ -119,59 +91,80 @@ const MyCalendar: React.FC = () => {
           </Button>
         </Box>
 
-        {/* Calendar */}
         <Calendar
-          localizer={localizer}
-          tooltipAccessor={null}
-          step={15}
-          events={filteredEvents}
-          startAccessor="start"
-          endAccessor="end"
-          views={['month', 'week', 'day']}
-          view={view}
-          onView={handleViewChange}
-          style={{ height: 800, marginTop: 20, 
-            color: textColor,
+  localizer={localizer}
+  tooltipAccessor={null}
+  step={15}
+  events={filteredEvents}
+  startAccessor="start"
+  endAccessor="end"
+  views={['month', 'week', 'day']}
+  view={view}
+  onView={handleViewChange}
+  style={{
+    height: 800,
+    marginTop: 20,
+    color: textColor,
+  }}
+  eventPropGetter={(event: CustomEvent) => ({
+    style: {
+      backgroundColor: TaskCategoryColors[event.type as TaskCategory],
+      borderRadius: '4px',
+      padding: '4px',
+      color: 'white',
+    },
+  })}
+  components={{
+    toolbar: (props) => (
+      <CustomToolbar {...props} onView={handleViewChange} view={view} />
+    ),
+    event: ({ event }: { event: CustomEvent }) => (
+      <Box
+        data-tooltip-id={`event-tooltip-${event.id}`}
+        data-tooltip-content={`🕒 ${moment(event.start).format('hh:mm A')} - ${moment(
+          event.end
+        ).format('hh:mm A')}\n${event.title}\n\n${event.robotType}\n`}
+        data-tooltip-place="bottom"
+        onClick={() => {
+          setSelectedEvent(event);
+          openDeleteModal();
+        }}
+        cursor="pointer"
+        position="relative"  // Make sure the event container is positioned
+      >
+           <Box  fontSize="10px">
+      {event.title}
+    </Box>
+    <Box fontSize="10px" color="gray.100">
+      {event.robotType}
+    </Box>
+        <Tooltip
+      id={`event-tooltip-${event.id}`}
+      style={{
+        position: 'fixed',
+        top: '50%',
+        left: '20%',
+        transform: 'translate(0%, 20%)',
+        maxWidth: '500px',
+        backgroundColor: '#1A202C',
+        color: 'white',
+        fontSize: '14px',
+        padding: '8px 12px',
+        borderRadius: '6px',
+        zIndex: 9999,
+      }}
+    />
+      </Box>
+    ),
+  }}
+  dayPropGetter={(date) => ({
+    style: {
+      backgroundColor: moment(date).isSame(moment(), 'day') ? todayBg : 'inherit',
+    },
+  })}
+/>
 
-            }}
-          eventPropGetter={(event: CustomEvent) => ({
-            style: {
-              backgroundColor: TaskCategoryColors[event.type as TaskCategory],
-              
-              borderRadius: '15px',
-              padding: '2px',
-            },
-          })}
-          components={{
-            toolbar: (props) => (
-              <CustomToolbar {...props} onView={handleViewChange} view={view} />
-            ),
-            event: ({ event }: { event: CustomEvent }) => (
-              <Box
-                data-tooltip-id={`event-tooltip-${event.id}`}
-                data-tooltip-content={`🕒 ${moment(event.start).format('hh:mm A')} - ${moment(
-                  event.end
-                ).format('hh:mm A')}\n ${event.title}`}
-                data-tooltip-place="top"
-                cursor="pointer"
-                onClick={() => {
-                  setSelectedEvent(event); // Set the selected event when clicked
-                  openDeleteModal(); // Open the delete confirmation modal
-                }}
-              >
-                {event.title}
-                <Tooltip id={`event-tooltip-${event.id}`} />
-              </Box>
-            ),
-          }}
-          dayPropGetter={(date) => ({
-            style: {
-              backgroundColor: moment(date).isSame(moment(), 'day') ? todayBg : 'inherit',
-            },
-          })}
-        />
-
-        {/* Delete Event Modal */}
+        {/* Delete Confirmation Modal */}
         {selectedEvent && (
           <Modal isOpen={isDeleteModalOpen} onClose={closeDeleteModal}>
             <ModalOverlay />
@@ -183,7 +176,7 @@ const MyCalendar: React.FC = () => {
                 <Button colorScheme="red" mr={3} onClick={handleDeleteEvent}>
                   Delete
                 </Button>
-                <Button variant="ghost" onClick={closeDeleteModal}>
+                <Button  onClick={closeDeleteModal} variant='outline'>
                   Cancel
                 </Button>
               </ModalFooter>
@@ -192,6 +185,7 @@ const MyCalendar: React.FC = () => {
         )}
       </Card>
 
+      {/* Event Creation Modal */}
       <EventModal isOpen={isModalOpen} onClose={closeModal} onAddEvent={handleAddEvent} />
     </Box>
   );

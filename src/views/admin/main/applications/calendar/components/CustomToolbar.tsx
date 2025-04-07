@@ -16,7 +16,8 @@ const CustomToolbar: React.FC<ToolbarProps<CustomEvent, object>> = ({
 }) => {
 
     const toolbarTextColor = useColorModeValue("black", "white");
-    const toolbarBorderColor = useColorModeValue("black", "grey.500");
+    const toolbarBorderColor = useColorModeValue("grey.500", "grey.500");
+    const buttonColor = useColorModeValue("teal", "gray");
 
 
   return (
@@ -35,11 +36,11 @@ const CustomToolbar: React.FC<ToolbarProps<CustomEvent, object>> = ({
       {/* Navigation Buttons */}
       <Box display="flex" alignItems="center">
 
-        <Button onClick={() => onNavigate("PREV")} mr="2">
+        <Button onClick={() => onNavigate("PREV")} mr="2" colorScheme={buttonColor} variant='solid'>
           ◀ Prev
         </Button>
 
-        <Button onClick={() => onNavigate("NEXT")} mr="2">
+        <Button onClick={() => onNavigate("NEXT")} mr="2" colorScheme={buttonColor} variant='solid' >
           Next ▶
         </Button>
       </Box>

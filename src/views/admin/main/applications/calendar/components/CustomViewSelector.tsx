@@ -6,6 +6,7 @@ import {
     MenuItem,
     MenuList,
     Icon,
+  
   } from "@chakra-ui/react";
   import {
     MdCalendarToday,
@@ -19,6 +20,8 @@ import {
   import { MdOutlineCalendarMonth } from "react-icons/md";
   import { FaCalendarDays } from "react-icons/fa6";
 
+
+
   
   const viewIcons: Record<View, JSX.Element> = {
     day: <Icon as={FaCalendarDay} boxSize={4}  mr={2} />,
@@ -29,6 +32,8 @@ import {
   };
   
   const viewOptions: View[] = ["day", "week", "month"]; // Limit to what you're using
+
+
   
   type CustomToolbarProps = {
     view: View;
@@ -38,7 +43,7 @@ import {
   const CustomViewSelector = ({ view, onView }: CustomToolbarProps) => {
     return (
         <Menu >
-        <MenuButton as={Button} size="md" rightIcon={<ChevronDownIcon />} >
+        <MenuButton as={Button} size="md" bg='teal' color="white" rightIcon={<ChevronDownIcon />} >
           {viewIcons[view]} {view.charAt(0).toUpperCase() + view.slice(1)}
         </MenuButton>
         <MenuList minW="200px" zIndex="popover">

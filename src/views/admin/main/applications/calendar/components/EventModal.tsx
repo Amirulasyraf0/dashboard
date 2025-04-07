@@ -222,11 +222,6 @@ const EventModal: React.FC<EventModalProps> = ({ isOpen, onClose, onAddEvent }) 
               </Flex>
             </FormControl>
 
-
-          
-
-
-
           </SimpleGrid>
         </ModalBody>
         <ModalFooter>
