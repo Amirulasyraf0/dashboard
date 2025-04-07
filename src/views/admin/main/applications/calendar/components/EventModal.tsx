@@ -16,7 +16,7 @@ import {
   SimpleGrid,
   Flex,
 } from '@chakra-ui/react';
-import { CustomEvent, TaskCategory, TaskCategoryColors } from './types/types';
+import { CustomEvent, TaskCategory, TaskCategoryColors , RobotType} from './types/types';
 
 interface EventModalProps {
   isOpen: boolean;
@@ -30,7 +30,8 @@ const EventModal: React.FC<EventModalProps> = ({ isOpen, onClose, onAddEvent }) 
   const [newEventStartTime, setNewEventStartTime] = useState('');
   const [newEventEndDate, setNewEventEndDate] = useState('');
   const [newEventEndTime, setNewEventEndTime] = useState('');
-  const [eventType, setEventType] = useState<TaskCategory>(TaskCategory.Sweep); // Default to Sweep
+  const [eventType, setEventType] = useState<TaskCategory>(TaskCategory.Cleaning_Task);
+  const [robotType, setrobotType] = useState<RobotType>(RobotType.Robot_A); // Default to Sweep
 
   const [error, setError] = useState<string | null>(null);
 
@@ -57,6 +58,11 @@ const EventModal: React.FC<EventModalProps> = ({ isOpen, onClose, onAddEvent }) 
   const handleEventTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedType = e.target.value as TaskCategory;
     setEventType(selectedType);
+  };
+
+  const handleEventRobotTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const RobotselectedType = e.target.value as RobotType;
+    setrobotType(RobotselectedType);
   };
 
   const handleAddEvent = () => {
@@ -86,7 +92,7 @@ const EventModal: React.FC<EventModalProps> = ({ isOpen, onClose, onAddEvent }) 
       start: startDateTime,
       end: endDateTime,
       type: eventType,
-      resource: eventType,
+      robotType: robotType,
     };
 
     onAddEvent(newEvent);
@@ -100,7 +106,7 @@ const EventModal: React.FC<EventModalProps> = ({ isOpen, onClose, onAddEvent }) 
     setNewEventStartTime('');
     setNewEventEndDate('');
     setNewEventEndTime('');
-    setEventType(TaskCategory.Sweep); // Reset type to default
+    setEventType(TaskCategory.Cleaning_Task); // Reset type to default
   };
 
   return (
@@ -127,6 +133,9 @@ const EventModal: React.FC<EventModalProps> = ({ isOpen, onClose, onAddEvent }) 
             </FormControl>
 
             {/* Row 2: Event Type (Category) */}
+
+
+
             <FormControl isInvalid={!!error}>
               <Flex direction="column" mb={4}>
                 <FormLabel>Task Category</FormLabel>
@@ -140,6 +149,8 @@ const EventModal: React.FC<EventModalProps> = ({ isOpen, onClose, onAddEvent }) 
                 {error && <FormErrorMessage>{error}</FormErrorMessage>}
               </Flex>
             </FormControl>
+
+
 
             {/* Row 3: Start Date and Start Time */}
             <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4}>
@@ -194,6 +205,28 @@ const EventModal: React.FC<EventModalProps> = ({ isOpen, onClose, onAddEvent }) 
                 </Flex>
               </FormControl>
             </SimpleGrid>
+
+
+
+            <FormControl isInvalid={!!error}>
+              <Flex direction="column" mb={4}>
+                <FormLabel>Robot Type</FormLabel>
+                <Select value={robotType} onChange={handleEventRobotTypeChange}>
+                  {Object.values(RobotType).map((category) => (
+                    <option key={category} value={category}>
+                      {category.charAt(0).toUpperCase() + category.slice(1)}
+                    </option>
+                  ))}
+                </Select>
+                {error && <FormErrorMessage>{error}</FormErrorMessage>}
+              </Flex>
+            </FormControl>
+
+
+          
+
+
+
           </SimpleGrid>
         </ModalBody>
         <ModalFooter>

@@ -2,6 +2,10 @@
 .rbc-calendar {
   font-family: sans-serif;
   font-size: 15px; 
+  border-left: 1px solid #f6f6f6;
+  border-top: 1px solid #f5f3f3;
+  border-right: 1px solid #f9f9f9;
+  border-bottom: 1px solid #f7f6f6;
 }
 
 .rbc-toolbar {
@@ -21,6 +25,17 @@
   background-color: #a54c46 !important; /* Light blue highlight for today */
 }
 
-.rbc-day-bg + .rbc-day-bg {
-  border-left: 1px solid #ffffff;
+
+
+.rbc-day-slot .rbc-events-container {
+  bottom: 0;
+  left: 0;
+  position: absolute;
+  right: 0;
+  margin-right: 10px;
+  top: 0;
+}
+.rbc-day-slot .rbc-events-container.rbc-rtl {
+  left: 10px;
+  right: 0;
 }

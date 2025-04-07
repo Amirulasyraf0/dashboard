@@ -1,13 +1,17 @@
 export enum TaskCategory {
-  Sweep = 'sweep',
-  Mop = 'mop',
+  Cleaning_Task = 'Cleaning Task',
   DailyMaintenance = 'Daily Maintenance',
   Other = 'other',
 }
 
+export enum RobotType {
+  Robot_A = 'Robot A',
+  Robot_B = 'Robot B',
+  Robot_C = 'Robot C',
+}
+
 export const TaskCategoryColors = {
-  [TaskCategory.Sweep]: '#FF5733',  // Red for meeting
-  [TaskCategory.Mop]: '#33B5FF',     // Blue for task
+  [TaskCategory.Cleaning_Task]: '#FF5733',  // Red for meeting
   [TaskCategory.DailyMaintenance]: '#33FF57', // Green for reminder
   [TaskCategory.Other]: '#F0E68C',    // Yellow for other
 };
@@ -18,6 +22,6 @@ export interface CustomEvent {
   start: Date;
   end: Date;
   type: string; 
-  resource: string;
+  robotType: string;
   //resourceId: string; // Event type (category)
 }
