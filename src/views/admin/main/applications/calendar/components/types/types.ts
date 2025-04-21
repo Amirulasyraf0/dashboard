@@ -23,5 +23,7 @@ export interface CustomEvent {
   end: Date;
   type: string; 
   robotType: string;
+  description?: string;
+  
   //resourceId: string; // Event type (category)
 }

@@ -15,8 +15,11 @@ import {
   FormErrorMessage,
   SimpleGrid,
   Flex,
+  Textarea
 } from '@chakra-ui/react';
-import { CustomEvent, TaskCategory, TaskCategoryColors , RobotType} from './types/types';
+import { CustomEvent, TaskCategory, RobotType } from './types/types';
+import ZoneSelectionModal from './ZoneSelection';
+import TimeSelect from './TimeSelect';
 
 interface EventModalProps {
   isOpen: boolean;
@@ -27,13 +30,21 @@ interface EventModalProps {
 const EventModal: React.FC<EventModalProps> = ({ isOpen, onClose, onAddEvent }) => {
   const [newEventTitle, setNewEventTitle] = useState('');
   const [newEventStartDate, setNewEventStartDate] = useState('');
-  const [newEventStartTime, setNewEventStartTime] = useState('');
+  const [startTimeHour, setStartTimeHour] = useState('08');
+  const [startTimeMinute, setStartTimeMinute] = useState('00');
   const [newEventEndDate, setNewEventEndDate] = useState('');
   const [newEventEndTime, setNewEventEndTime] = useState('');
   const [eventType, setEventType] = useState<TaskCategory>(TaskCategory.Cleaning_Task);
-  const [robotType, setrobotType] = useState<RobotType>(RobotType.Robot_A); // Default to Sweep
-
+  const [robotType, setRobotType] = useState<RobotType>(RobotType.Robot_A);
+  const [newEventDescription, setNewEventDescription] = useState('');
   const [error, setError] = useState<string | null>(null);
+
+  const [startTimePeriod, setStartTimePeriod] = useState('AM');
+
+  const handleStartTimePeriodChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setStartTimePeriod(e.target.value);
+  };
+
 
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setNewEventTitle(e.target.value);
@@ -43,8 +54,12 @@ const EventModal: React.FC<EventModalProps> = ({ isOpen, onClose, onAddEvent }) 
     setNewEventStartDate(e.target.value);
   };
 
-  const handleStartTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setNewEventStartTime(e.target.value);
+  const handleStartTimeHourChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setStartTimeHour(e.target.value);
+  };
+
+  const handleStartTimeMinuteChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setStartTimeMinute(e.target.value);
   };
 
   const handleEndDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -61,23 +76,31 @@ const EventModal: React.FC<EventModalProps> = ({ isOpen, onClose, onAddEvent }) 
   };
 
   const handleEventRobotTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const RobotselectedType = e.target.value as RobotType;
-    setrobotType(RobotselectedType);
+    const selectedRobotType = e.target.value as RobotType;
+    setRobotType(selectedRobotType);
+  };
+
+  const handleDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setNewEventDescription(e.target.value);
   };
 
   const handleAddEvent = () => {
-    if (
-      !newEventTitle ||
-      !newEventStartDate ||
-      !newEventStartTime ||
-      !newEventEndDate ||
-      !newEventEndTime
-    ) {
+    if (!newEventTitle || !newEventStartDate || !startTimeHour || !startTimeMinute || !newEventEndDate || !newEventEndTime) {
       setError('All fields are required!');
       return;
     }
 
-    const startDateTime = new Date(`${newEventStartDate}T${newEventStartTime}`);
+    let hour = parseInt(startTimeHour, 10);
+    if (startTimePeriod === 'PM' && hour !== 12) {
+      hour += 12;
+    } else if (startTimePeriod === 'AM' && hour === 12) {
+      hour = 0;
+    }
+  
+    const hourString = hour.toString().padStart(2, '0');
+    const startDateTime = new Date(`${newEventStartDate}T${hourString}:${startTimeMinute}`)
+
+
     const endDateTime = new Date(`${newEventEndDate}T${newEventEndTime}`);
 
     if (startDateTime >= endDateTime) {
@@ -93,6 +116,7 @@ const EventModal: React.FC<EventModalProps> = ({ isOpen, onClose, onAddEvent }) 
       end: endDateTime,
       type: eventType,
       robotType: robotType,
+      description: newEventDescription.trim() || undefined, // optional field
     };
 
     onAddEvent(newEvent);
@@ -103,10 +127,12 @@ const EventModal: React.FC<EventModalProps> = ({ isOpen, onClose, onAddEvent }) 
   const resetForm = () => {
     setNewEventTitle('');
     setNewEventStartDate('');
-    setNewEventStartTime('');
+ 
     setNewEventEndDate('');
     setNewEventEndTime('');
-    setEventType(TaskCategory.Cleaning_Task); // Reset type to default
+    setEventType(TaskCategory.Cleaning_Task);
+    setRobotType(RobotType.Robot_A); // Reset robotType to default
+    setNewEventDescription(''); // Reset description
   };
 
   return (
@@ -117,9 +143,7 @@ const EventModal: React.FC<EventModalProps> = ({ isOpen, onClose, onAddEvent }) 
         <ModalCloseButton />
         <ModalBody>
           <SimpleGrid columns={1} spacing={4}>
-
-            
-            {/* Row 1: Event Title */}
+            {/* Task Name */}
             <FormControl isInvalid={!!error}>
               <Flex direction="column" mb={4}>
                 <FormLabel>Task Name</FormLabel>
@@ -132,10 +156,21 @@ const EventModal: React.FC<EventModalProps> = ({ isOpen, onClose, onAddEvent }) 
               </Flex>
             </FormControl>
 
-            {/* Row 2: Event Type (Category) */}
+            {/* Task Description */}
+            <FormControl isInvalid={!!error}>
+              <Flex direction="column" mb={4}>
+                <FormLabel>Task Description (Optional)</FormLabel>
+                <Textarea
+                  placeholder="Enter Task Description"
+                  value={newEventDescription}
+                  onChange={handleDescriptionChange}
+                  resize="vertical"
+                />
+                {error && <FormErrorMessage>{error}</FormErrorMessage>}
+              </Flex>
+            </FormControl>
 
-
-
+            {/* Task Category */}
             <FormControl isInvalid={!!error}>
               <Flex direction="column" mb={4}>
                 <FormLabel>Task Category</FormLabel>
@@ -150,13 +185,11 @@ const EventModal: React.FC<EventModalProps> = ({ isOpen, onClose, onAddEvent }) 
               </Flex>
             </FormControl>
 
-
-
-            {/* Row 3: Start Date and Start Time */}
+            {/* Start Date and Time */}
             <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4}>
               <FormControl isInvalid={!!error}>
                 <Flex direction="column" mb={4}>
-                  <FormLabel>Start Date</FormLabel>
+                  <FormLabel>Start DateTime </FormLabel>
                   <Input
                     type="date"
                     value={newEventStartDate}
@@ -168,18 +201,21 @@ const EventModal: React.FC<EventModalProps> = ({ isOpen, onClose, onAddEvent }) 
 
               <FormControl isInvalid={!!error}>
                 <Flex direction="column" mb={4}>
-                  <FormLabel>Start Time</FormLabel>
-                  <Input
-                    type="time"
-                    value={newEventStartTime}
-                    onChange={handleStartTimeChange}
-                  />
+                  <FormLabel>Start Time </FormLabel>
+                  <TimeSelect
+  valueHour={startTimeHour}
+  valueMinute={startTimeMinute}
+  valuePeriod={startTimePeriod}
+  onChangeHour={handleStartTimeHourChange}
+  onChangeMinute={handleStartTimeMinuteChange}
+  onChangePeriod={handleStartTimePeriodChange}
+/>
                   {error && <FormErrorMessage>{error}</FormErrorMessage>}
                 </Flex>
               </FormControl>
             </SimpleGrid>
 
-            {/* Row 4: End Date and End Time */}
+            {/* End Date and Time */}
             <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4}>
               <FormControl isInvalid={!!error}>
                 <Flex direction="column" mb={4}>
@@ -206,24 +242,23 @@ const EventModal: React.FC<EventModalProps> = ({ isOpen, onClose, onAddEvent }) 
               </FormControl>
             </SimpleGrid>
 
-
-
+            {/* Robot Type */}
             <FormControl isInvalid={!!error}>
               <Flex direction="column" mb={4}>
                 <FormLabel>Robot Type</FormLabel>
                 <Select value={robotType} onChange={handleEventRobotTypeChange}>
-                  {Object.values(RobotType).map((category) => (
-                    <option key={category} value={category}>
-                      {category.charAt(0).toUpperCase() + category.slice(1)}
+                  {Object.values(RobotType).map((robot) => (
+                    <option key={robot} value={robot}>
+                      {robot.charAt(0).toUpperCase() + robot.slice(1)}
                     </option>
                   ))}
                 </Select>
                 {error && <FormErrorMessage>{error}</FormErrorMessage>}
               </Flex>
             </FormControl>
-
           </SimpleGrid>
         </ModalBody>
+
         <ModalFooter>
           <Button variant="outline" colorScheme="blue" onClick={onClose} mr="10px">
             Cancel
