@@ -21,36 +21,41 @@ const TimeSelect: React.FC<TimeSelectProps> = ({
   return (
     <Flex direction="row" justify="space-between" gap={2}>
       <FormControl>
-        <Select value={valueHour} onChange={onChangeHour} w="80px" className="time-select">
-          {[...Array(12)].map((_, i) => {
-            const hour = (i + 1).toString().padStart(2, '0'); // 01–12
-            return (
-              <option key={hour} value={hour}>
-                {hour}
-              </option>
-            );
-          })}
-        </Select>
+      <Select value={valueHour} onChange={onChangeHour} w="80px" className="time-select">
+  <option value="--">--</option> {/* Default unselected value */}
+  {[...Array(12)].map((_, i) => {
+    const hour = (i + 1).toString().padStart(2, '0'); // 01–12
+    return (
+      <option key={hour} value={hour}>
+        {hour}
+      </option>
+    );
+  })}
+</Select>
+
       </FormControl>
 
       <FormControl>
-        <Select value={valueMinute} onChange={onChangeMinute} w="80px" className="time-select">
-          {['00', '15', '30', '45'].map((minute) => (
-            <option key={minute} value={minute}>
-              {minute}
-            </option>
-          ))}
-        </Select>
+      <Select value={valueMinute} onChange={onChangeMinute} w="80px" className="time-select">
+  <option value="--">--</option> {/* Default unselected value */}
+  {['00', '15', '30', '45'].map((minute) => (
+    <option key={minute} value={minute}>
+      {minute}
+    </option>
+  ))}
+</Select>
+
       </FormControl>
 
       <FormControl>
-        <Select value={valuePeriod} onChange={onChangePeriod} w="80px" className="time-select">
-          {['AM', 'PM'].map((period) => (
-            <option key={period} value={period}>
-              {period}
-            </option>
-          ))}
-        </Select>
+      <Select value={valuePeriod} onChange={onChangePeriod} w="80px" className="time-select">
+  <option value="--">--</option> {/* Default option */}
+  {['AM', 'PM'].map((period) => (
+    <option key={period} value={period}>
+      {period}
+    </option>
+  ))}
+</Select>
       </FormControl>
 
       {/* You should place style like this only in global scope, but this works temporarily */}
