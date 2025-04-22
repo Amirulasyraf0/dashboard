@@ -24,6 +24,9 @@ export interface CustomEvent {
   type: string; 
   robotType: string;
   description?: string;
+  recurrence?: {
+    type: string; // Add a `type` field for recurrence (daily, weekly, etc.)
+  };
   
   //resourceId: string; // Event type (category)
 }

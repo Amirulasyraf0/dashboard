@@ -15,6 +15,7 @@ import {
   ModalCloseButton,
   ModalBody,
   ModalFooter,
+  Text,
 } from '@chakra-ui/react';
 import EventModal from './EventModal';
 import { CustomEvent, TaskCategory, TaskCategoryColors } from './types/types';
@@ -24,6 +25,8 @@ import './calendar.css';
 import { BsPlusCircleFill } from 'react-icons/bs';
 import CustomToolbar from './CustomToolbar';
 import { predefinedTasks } from './types/predefinedTasks';
+import { Checkbox, CheckboxGroup, Stack } from '@chakra-ui/react';
+
 
 const localizer = momentLocalizer(moment);
 
@@ -169,9 +172,21 @@ const MyCalendar: React.FC = () => {
           <Modal isOpen={isDeleteModalOpen} onClose={closeDeleteModal}>
             <ModalOverlay />
             <ModalContent>
-              <ModalHeader>Confirm Deletion</ModalHeader>
+              <ModalHeader>Event Details</ModalHeader>
               <ModalCloseButton />
-              <ModalBody>Are you sure you want to delete this event?</ModalBody>
+              <ModalBody>
+  <Text mb="2">
+    <strong>Event:</strong> {selectedEvent.title}
+  </Text>
+  <Text mb="2">
+    <strong>Robot:</strong> {selectedEvent.robotType}
+  </Text>
+  <Text>
+    <strong>Time:</strong>{' '}
+    {moment(selectedEvent.start).format('hh:mm A')} – {moment(selectedEvent.end).format('hh:mm A')}
+  </Text>
+</ModalBody>
+
               <ModalFooter>
                 <Button colorScheme="red" mr={3} onClick={handleDeleteEvent}>
                   Delete
