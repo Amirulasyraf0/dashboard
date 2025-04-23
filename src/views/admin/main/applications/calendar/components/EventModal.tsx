@@ -16,16 +16,22 @@ import {
   SimpleGrid,
   Flex,
   Textarea,
+  Radio,
   Tag,
   TagLabel,
   Text,
   Box,
   HStack,
+  Icon,
+  useRadioGroup,
 } from '@chakra-ui/react';
-import { CustomEvent, TaskCategory, RobotType } from './types/types';
+import { CustomEvent, TaskCategory, RobotType, ZoneType} from './types/types';
 import TimeSelect from './TimeSelect';
 import HorizontalDraggableLists from './Draggabletags';
 import { IoIosAddCircleOutline } from "react-icons/io";
+import { FaArrowsRotate } from "react-icons/fa6";
+import { CheckboxCard } from './RecurringOption';
+import { WeekdaySelector } from './WeeklySelector'
 
 interface EventModalProps {
   isOpen: boolean;
@@ -41,19 +47,27 @@ const EventModal: React.FC<EventModalProps> = ({ isOpen, onClose, onAddEvent }) 
   const [startTimeMinute, setStartTimeMinute] = useState('--');
   const [startTimePeriod, setStartTimePeriod] = useState('--');
   const [newEventEndDate, setNewEventEndDate] = useState('');
+
   const [eventType, setEventType] = useState<TaskCategory>(TaskCategory.Cleaning_Task);
   const [robotType, setRobotType] = useState<RobotType>(RobotType.Robot_A);
+  const [zoneType, setZoneType] = useState<ZoneType>(ZoneType.Zone_A);
+  const options = ['react', 'vue', 'svelte']
+
+
   const [newEventDescription, setNewEventDescription] = useState('');
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [endTimeHour, setEndTimeHour] = useState('--');
   const [endTimeMinute, setEndTimeMinute] = useState('--');
   const [endTimePeriod, setEndTimePeriod] = useState('--');
-
+  const [recurrence, setRecurrence] = useState<'none' | 'daily' | 'weekly' | 'monthly'>('none');
+  const [repeatUntil, setRepeatUntil] = useState('');
+  
   // Zone modal state and selected zones
-  const [isZoneModalOpen, setIsZoneModalOpen] = useState(false);
-  const openZoneModal = () => setIsZoneModalOpen(true);
-  const closeZoneModal = () => setIsZoneModalOpen(false);
-  const [selectedZones, setSelectedZones] = useState<string[]>([]);
+  const [isRecurrModalOpen, setIsRecurrModalOpen] = useState(false);
+  const openRecurrModal = () => setIsRecurrModalOpen(true);
+  const closeRecurrModal = () => setIsRecurrModalOpen(false);
+  //const [selectedZones, setSelectedZones] = useState<string[]>([]);
+  //const [zone, setZone] = useState('');
 
   // Handlers for time and form data
   const handleStartTimePeriodChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -102,11 +116,24 @@ const EventModal: React.FC<EventModalProps> = ({ isOpen, onClose, onAddEvent }) 
     setRobotType(selectedRobotType);
   };
 
+  const handleEventZoneTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedzoneType = e.target.value as ZoneType;
+    setZoneType(selectedzoneType);
+  };
+
   const handleDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setNewEventDescription(e.target.value);
   };
 
+  const { getRootProps, getRadioProps } = useRadioGroup({
+    name: 'framework',
+    defaultValue: 'react',
+    onChange: console.log,
+  })
+
   const isFormIncomplete = !newEventTitle || !newEventStartDate || !startTimeHour || !startTimeMinute || !newEventEndDate;
+
+  const zoneOptions = ['Zone A', 'Zone B', 'Zone C'];
 
   const handleAddEvent = () => {
     const newErrors: { [key: string]: string } = {};
@@ -153,6 +180,7 @@ const EventModal: React.FC<EventModalProps> = ({ isOpen, onClose, onAddEvent }) 
       start: startDateTime,
       end: endDateTime,
       type: eventType,
+      zoneType,
       robotType,
       description: newEventDescription.trim() || undefined,
     };
@@ -188,9 +216,10 @@ const EventModal: React.FC<EventModalProps> = ({ isOpen, onClose, onAddEvent }) 
           <ModalCloseButton />
           <ModalBody>
             <SimpleGrid columns={1} spacing={4}>
+            <Text fontSize="lg" fontWeight="bold">Task Info</Text>
               {/* Task Name */}
               <FormControl isInvalid={!!errors.title}>
-                <Flex direction="column" mb={4}>
+                <Flex direction="column" mb={1}>
                   <FormLabel>Task Name</FormLabel>
                   <Input
                     placeholder="Enter Your Task Name"
@@ -201,36 +230,6 @@ const EventModal: React.FC<EventModalProps> = ({ isOpen, onClose, onAddEvent }) 
                 </Flex>
               </FormControl>
 
-              {/* Task Description */}
-              <FormControl>
-                <Flex direction="column" mb={4}>
-                  <FormLabel>Task Description (Optional)</FormLabel>
-                  <Textarea
-                    placeholder="Enter Task Description"
-                    value={newEventDescription}
-                    onChange={handleDescriptionChange}
-                    resize="vertical"
-                  />
-                </Flex>
-              </FormControl>
-
-              {/* Robot Type */}
-              <FormControl>
-                <Flex direction="column" mb={4}>
-                  <FormLabel>Robot Type</FormLabel>
-                  <Select value={robotType} onChange={handleEventRobotTypeChange}>
-                    {Object.values(RobotType).map((robot) => (
-                      <option key={robot} value={robot}>
-                        {robot.charAt(0).toUpperCase() + robot.slice(1)}
-                      </option>
-                    ))}
-                  </Select>
-                </Flex>
-              </FormControl>
-
-              {/* Task Category & Zone Selection */}
-              <FormControl>
-                <SimpleGrid columns={{ base: 2, md: 2 }} spacing={4}>
                   {/* Task Category */}
                   <FormControl>
                     <Flex direction="column" mb={4}>
@@ -245,42 +244,74 @@ const EventModal: React.FC<EventModalProps> = ({ isOpen, onClose, onAddEvent }) 
                     </Flex>
                   </FormControl>
 
+                                {/* Task Description */}
+              <FormControl>
+                <Flex direction="column" mb={4}>
+                  <FormLabel>Task Description (Optional)</FormLabel>
+                  <Textarea
+                    placeholder="Enter Task Description"
+                    value={newEventDescription}
+                    onChange={handleDescriptionChange}
+                    resize="vertical"
+                  />
+                </Flex>
+              </FormControl>
+
+             {/* Robot Type && Zone Selection */}
+          
+                <SimpleGrid columns={{ base: 2, md: 2 }} spacing={2}>
+              
+
+                         {/* Robot Type */}       
+              <FormControl>
+                <Flex direction="column" mb={4}>
+                  <FormLabel>Robot Type</FormLabel>
+                  <Select value={robotType} onChange={handleEventRobotTypeChange}>
+                    {Object.values(RobotType).map((robot) => (
+                      <option key={robot} value={robot}>
+                        {robot.charAt(0).toUpperCase() + robot.slice(1)}
+                      </option>
+                    ))}
+                  </Select>
+                </Flex>
+              </FormControl>
+
+
+
                   {/* Add Zone Button */}
-                  <Flex direction="column" justifyContent="flex-end" mb={4}>
-                    <FormLabel>Zone Selection</FormLabel>
-                    <Button
-                      leftIcon={<IoIosAddCircleOutline />}
-                      colorScheme="blue"
-                      onClick={openZoneModal}
-                    >
-                      Add Zone
-                    </Button>
-                  </Flex>
-                </SimpleGrid>
+                  <FormControl>
+                <Flex direction="column" mb={4}>
+                  <FormLabel>Select Zone</FormLabel>
+                  <Select value={zoneType} onChange={handleEventZoneTypeChange}>
+                    {Object.values(ZoneType).map((zone) => (
+                      <option key={zone} value={zone}>
+                        {zone.charAt(0).toUpperCase() + zone.slice(1)}
+                      </option>
+                    ))}
+                  </Select>
+                </Flex>
+              </FormControl>
 
-                </FormControl>
+              </SimpleGrid>
 
-                {/* Display Selected Zones */}
-                <Box mt={2}>
-                  <FormLabel>Selected Zones</FormLabel>
-                  <HStack wrap="wrap" spacing={2}>
-                    {selectedZones.length > 0 ? (
-                      selectedZones.map((zone) => (
-                        <Tag key={zone} colorScheme="blue">
-                          <TagLabel>{zone}</TagLabel>
-                        </Tag>
-                      ))
-                    ) : (
-                      <Text fontSize="sm" color="gray.500">
-                        No zones selected
-                      </Text>
-                    )}
-                  </HStack>
-                </Box>
+              <Flex justify="space-between" px="1px"   >
+        <Text
+          fontSize="xl"
+          fontWeight="600"
+          lineHeight="100%"
+        >
+        Scheduling Details
+        </Text>
+        <Button
 
+          leftIcon={<FaArrowsRotate />} colorScheme='pink' variant='solid'
+          onClick={openRecurrModal}
 
+        >
+          Make Recurring
+        </Button>
+      </Flex>
              
-
               {/* Start Date and Time */}
               <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4}>
                 <FormControl isInvalid={!!errors.startDate}>
@@ -339,6 +370,27 @@ const EventModal: React.FC<EventModalProps> = ({ isOpen, onClose, onAddEvent }) 
                     {errors.endTime && <FormErrorMessage>{errors.endTime}</FormErrorMessage>}
                   </Flex>
                 </FormControl>
+
+                <FormControl>
+  <FormLabel>Repeat</FormLabel>
+  <Select value={recurrence} onChange={(e) => setRecurrence(e.target.value as any)}>
+    <option value="none">None</option>
+    <option value="daily">Daily</option>
+    <option value="weekly">Weekly</option>
+    <option value="monthly">Monthly</option>
+  </Select>
+</FormControl>
+
+{recurrence !== 'none' && (
+  <FormControl mt={4}>
+    <FormLabel>Repeat Until</FormLabel>
+    <Input
+      type="date"
+      value={repeatUntil}
+      onChange={(e) => setRepeatUntil(e.target.value)}
+    />
+  </FormControl>
+)}
               </SimpleGrid>
             </SimpleGrid>
           </ModalBody>
@@ -354,26 +406,27 @@ const EventModal: React.FC<EventModalProps> = ({ isOpen, onClose, onAddEvent }) 
         </ModalContent>
       </Modal>
 
-      {/* Zone Selection Modal */}
-      <Modal isOpen={isZoneModalOpen} onClose={closeZoneModal} size="xl" isCentered>
+      {/* Recurr Selection Modal  */}
+      <Modal isOpen={isRecurrModalOpen} onClose={closeRecurrModal} size="xl" isCentered>
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>Select Zone</ModalHeader>
+          <ModalHeader>Select Recurrence</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            <HorizontalDraggableLists
-              onSelectedChange={(zones) => setSelectedZones(zones.map((z) => z.label))}
-            />
+  
+            <WeekdaySelector />
+ 
+
           </ModalBody>
           <ModalFooter>
-            <Button variant="outline" colorScheme="blue" onClick={closeZoneModal} mr="10px">
+            <Button variant="outline" colorScheme="blue" onClick={closeRecurrModal} mr="10px">
               Cancel
             </Button>
             <Button
               colorScheme="blue"
               onClick={() => {
-                // You could add additional logic here if needed before closing
-                closeZoneModal();
+             
+                closeRecurrModal();
               }}
             >
               Add Zone
@@ -381,6 +434,7 @@ const EventModal: React.FC<EventModalProps> = ({ isOpen, onClose, onAddEvent }) 
           </ModalFooter>
         </ModalContent>
       </Modal>
+     
     </>
   );
 };

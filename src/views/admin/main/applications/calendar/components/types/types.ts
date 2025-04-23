@@ -10,6 +10,12 @@ export enum RobotType {
   Robot_C = 'Robot C',
 }
 
+export enum ZoneType {
+  Zone_A = 'Zone 1',
+  Zone_B = 'Zone 2',
+  Zone_C = 'Zone 3',
+}
+
 export const TaskCategoryColors = {
   [TaskCategory.Cleaning_Task]: '#197278',  // 
   [TaskCategory.DailyMaintenance]: '#c18c5d', // 
@@ -24,9 +30,10 @@ export interface CustomEvent {
   type: string; 
   robotType: string;
   description?: string;
-  recurrence?: {
-    type: string; // Add a `type` field for recurrence (daily, weekly, etc.)
-  };
+  recurrence?: 'none' | 'daily' | 'weekly' | 'monthly';
+  repeatUntil?: Date;
+  zoneType?: string;
   
-  //resourceId: string; // Event type (category)
+  
+
 }

@@ -18,7 +18,7 @@ import {
   Text,
 } from '@chakra-ui/react';
 import EventModal from './EventModal';
-import { CustomEvent, TaskCategory, TaskCategoryColors } from './types/types';
+import { CustomEvent, TaskCategory, TaskCategoryColors, ZoneType, RobotType } from './types/types';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import { Tooltip } from 'react-tooltip';
 import './calendar.css';
@@ -126,7 +126,7 @@ const MyCalendar: React.FC = () => {
         data-tooltip-id={`event-tooltip-${event.id}`}
         data-tooltip-content={`🕒 ${moment(event.start).format('hh:mm A')} - ${moment(
           event.end
-        ).format('hh:mm A')}\n${event.title}\n\n${event.robotType}\n`}
+        ).format('hh:mm A')}\n${event.title}\n\n${event.robotType}\n\n${event.zoneType}\n`}
         data-tooltip-place="bottom"
         onClick={() => {
           setSelectedEvent(event);
@@ -139,7 +139,7 @@ const MyCalendar: React.FC = () => {
       {event.title}
     </Box>
     <Box fontSize="10px" color="gray.100">
-      {event.robotType}
+      {event.robotType} {event.zoneType}
     </Box>
         <Tooltip
       id={`event-tooltip-${event.id}`}
@@ -180,6 +180,9 @@ const MyCalendar: React.FC = () => {
   </Text>
   <Text mb="2">
     <strong>Robot:</strong> {selectedEvent.robotType}
+  </Text>
+  <Text mb="2">
+    <strong>Zone:</strong> {selectedEvent.zoneType}
   </Text>
   <Text>
     <strong>Time:</strong>{' '}
