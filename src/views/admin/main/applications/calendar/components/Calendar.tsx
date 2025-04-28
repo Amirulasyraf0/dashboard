@@ -8,6 +8,7 @@ import {
   useColorModeValue,
   IconButton,
   Select,
+  Icon,
   Modal,
   ModalOverlay,
   ModalContent,
@@ -16,6 +17,13 @@ import {
   ModalBody,
   ModalFooter,
   Text,
+  Menu,
+  MenuButton,
+  MenuList,
+  MenuItem,
+  Checkbox,
+  CheckboxGroup,
+  Stack,
 } from '@chakra-ui/react';
 import EventModal from './EventModal';
 import { CustomEvent, TaskCategory, TaskCategoryColors, ZoneType, RobotType } from './types/types';
@@ -25,7 +33,12 @@ import './calendar.css';
 import { BsPlusCircleFill } from 'react-icons/bs';
 import CustomToolbar from './CustomToolbar';
 import { predefinedTasks } from './types/predefinedTasks';
-import { Checkbox, CheckboxGroup, Stack } from '@chakra-ui/react';
+import { ChevronDownIcon } from '@chakra-ui/icons';
+import { IoFilter } from "react-icons/io5";
+import { FaRobot } from "react-icons/fa";
+import { BsRobot } from 'react-icons/bs';
+import { PiRobot } from "react-icons/pi";
+
 
 
 const localizer = momentLocalizer(moment);
@@ -35,8 +48,22 @@ const MyCalendar: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<CustomEvent | null>(null);
   const [view, setView] = useState<View>('week');
-  const [filterType, setFilterType] = useState<TaskCategory | 'All'>('All');
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+
+  const [filterTypes, setFilterTypes] = useState<RobotType[]>([
+    RobotType.Robot_A,
+    RobotType.Robot_B,
+    RobotType.Robot_C,
+  ]);
+
+  const filteredEvents =
+    filterTypes.length === 0
+      ? [] // <--- show nothing if none selected
+      : events.filter((event) => filterTypes.includes(event.robotType as RobotType));
+
+  //const filteredEvents =
+  //filterType === 'All' ? events : events.filter((event) => event.robotType === filterType);
+
 
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
@@ -63,8 +90,6 @@ const MyCalendar: React.FC = () => {
     }
   };
 
-  const filteredEvents =
-    filterType === 'All' ? events : events.filter((event) => event.robotType === filterType);
 
   const bgColor = useColorModeValue('white', 'navy.800');
   const textColor = useColorModeValue('black', 'white');
@@ -75,16 +100,34 @@ const MyCalendar: React.FC = () => {
       <Card width="100%" padding="20px" borderRadius="10px" bg={bgColor}>
         {/* Controls */}
         <Box display="flex" justifyContent="space-between" alignItems="center" mb={4}>
-          <Select
-            width="200px"
-            value={filterType}
-            onChange={(e) => setFilterType(e.target.value as TaskCategory | 'All')}
-          >
-            <option value="All">All</option>
-            <option value="Robot A">Robot A</option>
-            <option value="Robot B">Robot B</option>
-            <option value="Robot C">Robot C</option>
-          </Select>
+        <Menu closeOnSelect={false} >
+      
+    <MenuButton as={Button} rightIcon={<ChevronDownIcon />} width="200px" colorScheme='purple' >
+    
+      Filter By Robot
+    </MenuButton>
+    <MenuList minWidth="240px" p="2">
+    <CheckboxGroup value={filterTypes} onChange={(values) => setFilterTypes(values as RobotType[])}>
+                <Stack direction="column">
+                <Checkbox value={RobotType.Robot_A}>
+                    <Box display="flex" alignItems="center">
+                      <Icon as={BsRobot} mr="2" /> Robot A
+                    </Box>
+                  </Checkbox>
+                  <Checkbox value={RobotType.Robot_B}>
+                    <Box display="flex" alignItems="center">
+                      <Icon as={PiRobot} mr="2" /> Robot B
+                    </Box>
+                  </Checkbox>
+                  <Checkbox value={RobotType.Robot_C}>
+                    <Box display="flex" alignItems="center">
+                      <Icon as={FaRobot} mr="2" /> Robot C
+                    </Box>
+                  </Checkbox>
+                </Stack>
+              </CheckboxGroup>
+    </MenuList>
+  </Menu>
 
           <Button w="140px" variant="brand" fontWeight="500" onClick={openModal} ml="auto">
             <Box mr="8px">

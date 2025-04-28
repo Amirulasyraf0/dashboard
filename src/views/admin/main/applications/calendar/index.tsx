@@ -25,7 +25,7 @@ import { Box, Grid, Text, useColorModeValue } from '@chakra-ui/react';
 // Custom components
 import Card from 'components/card/Card';
 // Assets
-import { calendarData } from 'views/admin/main/applications/calendar/variables/calendar';
+
 import EventCalendar from 'components/calendar/EventCalendar';
 import Timeline from 'views/admin/main/applications/calendar/components/Timeline';
 import Events from 'views/admin/main/applications/calendar/components/Events';

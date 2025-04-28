@@ -18,4 +18,7 @@
   height: 170px !important;
 }
 
-
+.rbc-current-time-indicator {
+  background-color: #ff0202;  /* Change to your preferred color */
+  
+}
