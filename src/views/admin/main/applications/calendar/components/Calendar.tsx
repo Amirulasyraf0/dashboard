@@ -111,17 +111,17 @@ const MyCalendar: React.FC = () => {
                 <Stack direction="column">
                 <Checkbox value={RobotType.Robot_A}>
                     <Box display="flex" alignItems="center">
-                      <Icon as={BsRobot} mr="2" /> Robot A
+                      <Icon as={BsRobot} mr="2" /> Lionsbot Rex
                     </Box>
                   </Checkbox>
                   <Checkbox value={RobotType.Robot_B}>
                     <Box display="flex" alignItems="center">
-                      <Icon as={PiRobot} mr="2" /> Robot B
+                      <Icon as={PiRobot} mr="2" /> R3 Scrub
                     </Box>
                   </Checkbox>
                   <Checkbox value={RobotType.Robot_C}>
                     <Box display="flex" alignItems="center">
-                      <Icon as={FaRobot} mr="2" /> Robot C
+                      <Icon as={FaRobot} mr="2" /> R3 Vac
                     </Box>
                   </Checkbox>
                 </Stack>
